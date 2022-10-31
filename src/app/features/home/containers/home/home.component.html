@@ -1,0 +1,44 @@
+<div class="home-container">
+  <mat-drawer-container class="drawer-container" autosize>
+    <mat-drawer #drawer class="sidenav" mode="side">
+      <div class="row">
+        <div class="col-12 d-flex justify-content-end mb-2">
+          <mat-icon class="close-icon" (click)="onCloseDrawer()"
+            >close</mat-icon
+          >
+        </div>
+      </div>
+      <p>{{ infoContent }}</p>
+    </mat-drawer>
+    <div class="sidenav-content">
+      <google-map
+        #myGoogleMap
+        height="100vh"
+        width="100%"
+        [center]="center"
+        [options]="options"
+        (mapClick)="eventHandler($event, 'mapClick')"
+        (mapDblclick)="eventHandler($event, 'mapDblclick')"
+        (mapDrag)="eventHandler($event, 'mapDrag')"
+        (mapDragend)="eventHandler($event, 'mapDragend')"
+        (mapRightclick)="eventHandler($event, 'mapRightclick')"
+        (positionChanged)="eventHandler($event, 'marker_positionChanged')"
+        (zoomChanged)="eventHandler($event, 'zoomChanged')"
+      >
+        <map-marker
+          #markerElem="mapMarker"
+          *ngFor="let marker of markers"
+          [position]="marker.position"
+          [label]="marker.name"
+          [title]="marker.name"
+          (mapClick)="openInfo(markerElem, marker.name)"
+        >
+        </map-marker>
+
+        <map-info-window (closeclick)="onCloseMapInfoWindow()">{{
+          infoContent
+        }}</map-info-window>
+      </google-map>
+    </div>
+  </mat-drawer-container>
+</div>

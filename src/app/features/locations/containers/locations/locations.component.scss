@@ -1,0 +1,13 @@
+.locations-container {
+  width: 100%;
+  margin-top: 50px;
+  padding: 0 20px;
+
+  .search-input {
+    width: 400px;
+  }
+
+  mat-form-field {
+    width: 100%;
+  }
+}

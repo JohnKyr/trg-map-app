@@ -1,0 +1,82 @@
+<div class="locations-container">
+  <!-- <mat-spinner
+    style="margin: 50px auto"
+    *ngIf="loading$ | async; else locationsList"
+  ></mat-spinner> -->
+
+  <!-- <ng-template #locationsList>
+    <div class="row">
+      <div class="col-12">
+        <div class="create-btn d-flex justify-content-end mb-2">
+          <button
+            type="button"
+            (click)="openDialogForm()"
+            mat-button
+            color="primary"
+          >
+            <mat-icon>add</mat-icon>
+            Create
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <ng-container *ngIf="locationView$ | async as locationView">
+          <app-location-list
+            [dataSource]="locationView.locations"
+            [locationsSort]="locationView.sort"
+            (changeSort)="handleChangeSort($event)"
+          ></app-location-list>
+          <mat-paginator
+            [pageIndex]="locationView.page - 1"
+            [length]="locationView.totalResults"
+            [pageSize]="locationView.limit"
+            [pageSizeOptions]="limits"
+            (page)="handleChangePage($event)"
+          ></mat-paginator>
+        </ng-container>
+      </div>
+    </div>
+  </ng-template> -->
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="search-input">
+          <mat-form-field appearance="standard">
+            <mat-label>Search</mat-label>
+            <input matInput placeholder="Search" />
+          </mat-form-field>
+        </div>
+        <button
+          type="button"
+          (click)="openDialogForm()"
+          mat-button
+          color="primary"
+        >
+          <mat-icon>add</mat-icon>
+          Create
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <ng-container *ngIf="locationView$ | async as locationView">
+        <app-location-list
+          [dataSource]="locationView.locations"
+          [locationsSort]="locationView.sort"
+          (changeSort)="handleChangeSort($event)"
+          (action)="handleAction($event)"
+        ></app-location-list>
+        <mat-paginator
+          [pageIndex]="locationView.page - 1"
+          [length]="locationView.totalResults"
+          [pageSize]="locationView.limit"
+          [pageSizeOptions]="limits"
+          (page)="handleChangePage($event)"
+        ></mat-paginator>
+      </ng-container>
+    </div>
+  </div>
+</div>

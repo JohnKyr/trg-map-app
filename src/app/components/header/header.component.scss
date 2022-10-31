@@ -1,0 +1,28 @@
+.nav-menu {
+  ul {
+    display: flex;
+    list-style-type: none;
+    margin-bottom: 0;
+    align-items: center;
+  }
+
+  .menu-link {
+    margin-right: 10px;
+
+    a {
+      display: flex;
+      text-decoration: none;
+      align-items: center;
+    }
+
+    .active-link {
+      color: blue;
+    }
+
+    .link-label {
+      display: block;
+      font-size: 16px;
+      margin-left: 3px;
+    }
+  }
+}
