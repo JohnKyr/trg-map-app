@@ -14,30 +14,30 @@ import { MatInputModule } from '@angular/material/input';
 
 import { LocationsRoutingModule } from './locations-routing.module';
 import { LocationsComponent } from './containers/locations/locations.component';
-import { LocationListComponent } from './components/location-list/location-list.component';
-import { ReactiveFormsModule } from '@angular/forms';
 import { LocationsDialogFormComponent } from './components/locations-dialog-form/locations-dialog-form.component';
+import { ReactiveFormsModule } from '@angular/forms';
+import { LocationListComponent } from './components/location-list/location-list.component';
 
 @NgModule({
   declarations: [
     LocationsComponent,
-    LocationListComponent,
     LocationsDialogFormComponent,
+    LocationListComponent,
   ],
   imports: [
     CommonModule,
-    HttpClientModule,
     ReactiveFormsModule,
-    LocationsRoutingModule,
-    MatTableModule,
-    MatPaginatorModule,
-    MatProgressSpinnerModule,
-    MatSortModule,
+    HttpClientModule,
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatProgressSpinnerModule,
+    MatSortModule,
+    LocationsRoutingModule,
   ],
 })
 export class LocationsModule {}

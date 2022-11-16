@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>Create Location</h2>
+<h2 mat-dialog-title>{{ action === "edit" ? "Update" : "Create" }} Location</h2>
 
 <div mat-dialog-content>
   <form [formGroup]="form">
@@ -38,8 +38,16 @@
   </form>
 </div>
 <div mat-dialog-actions class="action-area">
-  <button class="mat-raised-button" (click)="close()">Close</button>
-  <button class="mat-raised-button mat-primary save-btn" (click)="save()">
+  <button type="button" mat-button color="warn" (click)="close()">
+    Cancel
+  </button>
+  <button
+    type="button"
+    mat-raised-button
+    color="primary"
+    class="save-btn"
+    (click)="save()"
+  >
     Save
   </button>
 </div>

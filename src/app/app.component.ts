@@ -1,5 +1,5 @@
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Component, OnInit } from '@angular/core';
-import { LocationsService } from './features/locations/services/locations.service';
 
 @Component({
   selector: 'app-root',
@@ -7,7 +7,7 @@ import { LocationsService } from './features/locations/services/locations.servic
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
-  title = 'trg-map-app';
+  constructor() {}
 
   ngOnInit(): void {}
 }

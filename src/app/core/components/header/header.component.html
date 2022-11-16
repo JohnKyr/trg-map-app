@@ -1,0 +1,41 @@
+<mat-toolbar color="primary">
+  <span>TRG-Locations</span>
+  <nav class="nav-menu">
+    <ul class="menu">
+      <li class="menu-link">
+        <a
+          routerLink="/home"
+          routerLinkActive="active-link"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          <mat-icon
+            aria-hidden="false"
+            aria-label="home icon"
+            fontIcon="home"
+          ></mat-icon>
+          <span class="link-label">Home</span>
+        </a>
+      </li>
+      <li class="menu-link">
+        <a
+          routerLink="/locations"
+          routerLinkActive="active-link"
+          [routerLinkActiveOptions]="{ exact: true }"
+          [queryParams]="{
+            _page: 1,
+            _limit: 10,
+            _sort: 'name',
+            _order: 'asc'
+          }"
+        >
+          <mat-icon
+            aria-hidden="false"
+            aria-label="home icon"
+            fontIcon="location_on"
+          ></mat-icon>
+          <span class="link-label">Locations</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</mat-toolbar>

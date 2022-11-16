@@ -2,22 +2,26 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import {
   BehaviorSubject,
+  catchError,
   combineLatest,
   debounceTime,
+  EMPTY,
   map,
   Observable,
+  of,
   shareReplay,
   switchMap,
   tap,
 } from 'rxjs';
+import { ToastService } from 'src/app/shared/services';
 import { environment } from 'src/environments/environment';
 import {
-  TrgLocationResponse,
-  TrgLocation,
-  LIMITS,
-  DEFAULT_SEARCH,
   DEFAULT_LIMIT,
   DEFAULT_PAGE,
+  DEFAULT_SEARCH,
+  LIMITS,
+  TrgLocation,
+  TrgLocationResponse,
   TrgLocationSort,
 } from '../models/location.model';
 
@@ -93,14 +97,50 @@ export class LocationsService {
     map(([totalResults, limit]) => Math.ceil(totalResults / limit))
   );
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private toastService: ToastService) {}
+
+  getAllLocations() {
+    return this.http.get(`${environment.baseUrl}`).pipe(
+      map((res: any) => {
+        return res.map((item: TrgLocationResponse) => {
+          const [latitude, longitude] = item.coordinates;
+          return {
+            id: item.id,
+            latitude,
+            longitude,
+            name: item.name,
+          };
+        });
+      })
+    );
+  }
 
   create(location: TrgLocationResponse) {
-    return this.http.post(`${environment.baseUrl}`, location);
+    return this.http.post(`${environment.baseUrl}`, location).pipe(
+      map((response) => {
+        this.toastService.showSuccess('Location successfully created!');
+      }),
+      catchError((error) => {
+        console.log('Error on creating location: ', error);
+        this.toastService.showError('There is a problem.Try again later!');
+        return of();
+      })
+    );
   }
 
   update(location: TrgLocationResponse) {
-    return this.http.put(`${environment.baseUrl}/${location.id}`, location);
+    return this.http
+      .put(`${environment.baseUrl}/${location.id}`, location)
+      .pipe(
+        map((response) => {
+          this.toastService.showSuccess('Location successfully updated!');
+        }),
+        catchError((error) => {
+          console.log('Error on updating location: ', error);
+          this.toastService.showError('There is a problem.Try again later!');
+          return of();
+        })
+      );
   }
 
   onSearch(term: string) {
@@ -127,10 +167,34 @@ export class LocationsService {
   getCurrentPageLimit() {
     return this.limitBS.getValue();
   }
+
   getCurrentSort() {
     return this.sortBS.getValue();
   }
+
   getCurrentPage() {
     return this.pageBS.getValue();
+  }
+
+  toTrgLocationResponse(location: TrgLocation): TrgLocationResponse {
+    return {
+      id: location.id || undefined,
+      coordinates: [+location.latitude, +location.longitude],
+      name: location.name,
+    };
+  }
+
+  toTrgLocation(location: {
+    lat: number;
+    lng: number;
+    name?: string;
+    id?: number;
+  }): TrgLocation {
+    return {
+      id: location.id || undefined,
+      latitude: location.lat,
+      longitude: location.lng,
+      name: location.name || '',
+    };
   }
 }

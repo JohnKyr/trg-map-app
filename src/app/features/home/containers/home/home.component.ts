@@ -1,38 +1,43 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { LocationsDialogFormComponent } from './../../../locations/components/locations-dialog-form/locations-dialog-form.component';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { LocationFormData } from './../../../locations/models/location.model';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { GoogleMap, MapInfoWindow, MapMarker } from '@angular/google-maps';
-
+import { MatDrawer } from '@angular/material/sidenav';
+import { EMPTY, map, Observable, Subject, switchMap, tap } from 'rxjs';
 import { TrgLocation } from 'src/app/features/locations/models/location.model';
 import { LocationsService } from 'src/app/features/locations/services/locations.service';
-import { MatDrawer } from '@angular/material/sidenav';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
-export class HomeComponent implements OnInit, OnDestroy {
-  private destroy$ = new Subject();
-  locations$!: Observable<TrgLocation[]>;
-  showInfoColumn = false;
-  center!: google.maps.LatLngLiteral;
-  options: google.maps.MapOptions = {
-    zoomControl: true,
-    scrollwheel: true,
-    disableDoubleClickZoom: true,
-    mapTypeId: 'hybrid',
-    // maxZoom: this.maxZoom,
-    // minZoom: this.minZoom,
-  };
-  markers = [] as any;
-  infoContent = '';
-
+export class HomeComponent implements OnInit {
   @ViewChild('myGoogleMap', { static: false }) map!: GoogleMap;
   @ViewChild(MapInfoWindow, { static: false }) info!: MapInfoWindow;
   @ViewChild('drawer') drawer!: MatDrawer;
 
-  constructor(private locationService: LocationsService) {}
+  private destroy$ = new Subject();
+  locations$!: Observable<TrgLocation[]>;
+  markers$!: Observable<any[]>;
+  markers = [] as any;
+  infoContent = '';
+
+  showInfoColumn = false;
+  zoom = 15;
+  center!: google.maps.LatLngLiteral;
+  options: google.maps.MapOptions = {
+    mapTypeId: 'roadmap',
+    zoomControl: true,
+    scrollwheel: false,
+    disableDoubleClickZoom: true,
+  };
+
+  constructor(
+    private locationService: LocationsService,
+    private dialog: MatDialog
+  ) {}
 
   ngOnInit(): void {
     navigator.geolocation.getCurrentPosition((position) => {
@@ -41,39 +46,27 @@ export class HomeComponent implements OnInit, OnDestroy {
         lng: position.coords.longitude,
       };
     });
-    this.locationService.locations$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((locations) => {
-        this.markers = locations.map((location: any) => {
-          return {
-            position: { lat: location.latitude, lng: location.longitude },
-            name: location.name,
-          };
-        });
-      });
+
+    this.markers$ = this.getAll();
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next(null);
-    this.destroy$.complete();
-  }
+  onCreateLocation(event: any) {
+    if (event.latLng) {
+      console.log('addMarker...');
+      console.log(event);
+      console.log(event.placeId);
+      console.log(event.latLng?.toJSON());
 
-  dropMarker(event: any) {
-    this.markers.push({
-      position: {
-        lat: event.latLng.lat(),
-        lng: event.latLng.lng(),
-      },
-      label: {
-        color: 'blue',
-        text: 'Marker label ' + (this.markers.length + 1),
-      },
-      title: 'Marker title ' + (this.markers.length + 1),
-      info: 'Marker info ' + (this.markers.length + 1),
-      options: {
-        animation: google.maps.Animation.DROP,
-      },
-    });
+      const { lat, lng } = event.latLng?.toJSON();
+      const location: TrgLocation = {
+        id: undefined,
+        latitude: lat,
+        longitude: lng,
+        name: '',
+      };
+      const locationFormData: LocationFormData = { location, action: 'create' };
+      this.openDialogForm(locationFormData);
+    }
   }
 
   openInfo(marker: MapMarker, content: string) {
@@ -85,15 +78,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.showInfoColumn = true;
   }
 
-  eventHandler(event: any, name: string) {
-    console.log(event, name);
-
-    // Add marker on double click event
-    if (name === 'mapDblclick') {
-      this.dropMarker(event);
-    }
-  }
-
   onCloseMapInfoWindow() {
     this.drawer.toggle();
   }
@@ -101,5 +85,57 @@ export class HomeComponent implements OnInit, OnDestroy {
   onCloseDrawer() {
     this.drawer.toggle();
     this.info.close();
+  }
+
+  private openDialogForm(locationData: LocationFormData) {
+    const dialogConfig = new MatDialogConfig();
+
+    dialogConfig.disableClose = true;
+    dialogConfig.autoFocus = true;
+    dialogConfig.width = '400px';
+    dialogConfig.data = {
+      location: locationData.location,
+      action: locationData.action,
+    };
+
+    const dialogRef = this.dialog.open(
+      LocationsDialogFormComponent,
+      dialogConfig
+    );
+
+    return dialogRef
+      .afterClosed()
+      .pipe(
+        tap((data) => {
+          console.log('FORM DATA => ', data);
+        }),
+        switchMap((data: TrgLocation) => {
+          if (!data) {
+            return EMPTY;
+          }
+          const trgLocationResponse =
+            this.locationService.toTrgLocationResponse(data);
+          return locationData.action === 'edit'
+            ? this.locationService.update(trgLocationResponse)
+            : this.locationService.create(trgLocationResponse);
+        })
+      )
+      .subscribe((response) => {
+        this.markers$ = this.getAll();
+      });
+  }
+
+  private getAll() {
+    return this.locationService.getAllLocations().pipe(
+      tap((locations) => console.log('Markers => ', locations)),
+      map((locations: TrgLocation[]) => {
+        return locations.map((location: TrgLocation) => {
+          return {
+            position: { lat: location.latitude, lng: location.longitude },
+            name: location.name,
+          };
+        });
+      })
+    );
   }
 }
