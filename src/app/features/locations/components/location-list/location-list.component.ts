@@ -8,7 +8,7 @@ import { TrgLocation, TrgLocationSort } from '../../models/location.model';
   styleUrls: ['./location-list.component.scss'],
 })
 export class LocationListComponent implements OnInit {
-  @Input() dataSource!: Location[];
+  @Input() dataSource!: TrgLocation[];
   @Input() totalResults!: number;
   @Input() totalPages!: number;
   @Input() locationsSort!: TrgLocationSort;

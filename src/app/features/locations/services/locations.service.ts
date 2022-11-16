@@ -1,4 +1,4 @@
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import {
   BehaviorSubject,
@@ -75,7 +75,7 @@ export class LocationsService {
     map((res: any) => res.headers.get('x-total-count'))
   );
 
-  locations$: Observable<Location[]> = this.locationsResponse$.pipe(
+  locations$: Observable<TrgLocation[]> = this.locationsResponse$.pipe(
     map((res: any) => {
       return res.body.map((item: TrgLocationResponse) => {
         const [latitude, longitude] = item.coordinates;
